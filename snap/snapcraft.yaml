@@ -1,0 +1,41 @@
+name: multicommander
+version: latest
+version-script: cat $SNAPCRAFT_STAGE/version
+summary: File Manager For Professionals.
+description: |
+ multicommander contains a lot of features to make you efficent when working with files and folders.
+
+confinement: strict
+grade: stable
+architectures:
+  - build-on: amd64
+  - build-on: i386
+
+plugs:
+  wine-platform-plug:
+    content: wine-base-stable
+    interface: content
+    target: $SNAP/wine-platform
+    default-provider: wine-platform
+
+apps:
+  multicommander:
+    command: multicommander
+    desktop: usr/share/applications/multicommander.desktop
+    plugs: [ wayland, x11, opengl, home, desktop, desktop-legacy, hardware-observe, process-control, cups-control, removable-media, wine-platform-plug ]
+
+parts:
+  multicommander:
+    plugin: nil
+    source: ./src
+    override-build: |
+      snapcraftctl build
+      set -ex
+      ver=$(wget http://multicommander.com/downloads -q -S -O - 2>&1 | grep 'version_' | head -n1 | sed 's|n_| |;s|">| |' | awk '{print $3}')
+      echo $ver > $SNAPCRAFT_STAGE/version
+      ./dl_mc
+    stage:
+      - bin
+      - usr
+      - wine-platform
+    build-packages: [wget, unzip]

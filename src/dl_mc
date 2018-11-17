@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   mmtrt [Taqi Raza]
+#
+# Description:
+#   download and prepare multicommander for snap
+#
+# Date: Nov 17 2018
+#
+
+dlmc () {
+    ver="$(wget http://multicommander.com/downloads -q -S -O - 2>&1 | grep 'version_' | head -n1 | sed 's|n_| |;s|">| |' | awk '{print $3}')"
+    ARCHITECTURE=$(dpkg --print-architecture)
+    mkdir -p usr/share
+    if [ "${ARCHITECTURE}" = "amd64" ]; then
+     wget http://multicommander.com/files/updates/MultiCommander_x64_Portable_\($ver\).zip
+     unzip MultiCommander_x64_Portable_\($ver\).zip -x 'ChangeLog.txt' -d "usr/share/multicommander"
+    elif [ "${ARCHITECTURE}" = "i386" ]; then
+     wget http://multicommander.com/files/updates/MultiCommander_win32_Portable_\($ver\).zip
+     unzip MultiCommander_win32_Portable_\($ver\).zip -x 'ChangeLog.txt' -d "usr/share/multicommander" &> /dev/null
+    else
+     echo "ERROR! multicommander only produces software for amd64 and i386. Failing the build here."
+     exit 1
+    fi
+}
+
+mkmc () {
+    mkdir ./{wine-platform,bin} && mkdir -p usr/share/{pixmaps,applications}
+    mv usr/share/multicommander/MultiCommander.exe usr/share/multicommander/multicommander.exe
+    find "usr" -type d -execdir chmod 755 {} +
+}
+
+mkdsk () {
+cat > multicommander.desktop <<'EOF1'
+[Desktop Entry]
+Name=Multi Commander
+GenericName=File Manager
+Comment=File Manager For Professionals.
+Encoding=UTF-8
+Version=
+Type=Application
+Terminal=false
+Icon=${SNAP}/usr/share/pixmaps/multicommander.png
+Exec=multicommander %F
+StartupWMClass=multicommander.exe
+Categories=System;FileTools;FileManager
+MimeType=inode/directory;
+EOF1
+sed -i -e 's|Version=|Version='"$ver"'|g' multicommander.desktop
+}
+
+dlmc
+mkmc
+mkdsk
+mv multicommander bin && mv multicommander.desktop usr/share/applications && mv multicommander.png usr/share/pixmaps && cp -R -p {bin,usr,wine-platform} $SNAPCRAFT_PART_INSTALL
