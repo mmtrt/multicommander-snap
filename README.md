@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="" alt="Project">
+  <img src="https://dashboard.snapcraft.io/site_media/appmedia/2018/11/multicommander.png?raw=true" alt="Project">
   <br />
   multicommander
 </h1>
