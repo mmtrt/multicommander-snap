@@ -26,7 +26,7 @@ dlmc () {
 }
 
 mkmc () {
-    mkdir ./{wine-platform,bin} && mkdir -p usr/share/{pixmaps,applications}
+    mkdir -p ./{wine-runtime,wine-platform,bin} && mkdir -p usr/share/{pixmaps,applications}
     mv usr/share/multicommander/MultiCommander.exe usr/share/multicommander/multicommander.exe
     find "usr" -type d -execdir chmod 755 {} +
 }
@@ -53,4 +53,4 @@ sed -i -e 's|Version=|Version='"$ver"'|g' multicommander.desktop
 dlmc
 mkmc
 mkdsk
-mv multicommander bin && mv multicommander.desktop usr/share/applications && mv multicommander.png usr/share/pixmaps && cp -R -p {bin,usr,wine-platform} $SNAPCRAFT_PART_INSTALL
+mv multicommander bin && mv multicommander.desktop usr/share/applications && mv multicommander.png usr/share/pixmaps && cp -R -p {bin,usr,wine-runtime,wine-platform} $SNAPCRAFT_PART_INSTALL
