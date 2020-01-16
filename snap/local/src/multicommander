@@ -314,7 +314,7 @@ progHome=$SNAP_USER_DATA/$progName
 progBin=$progName.exe
 
 if [ ! -d $progHome ];then
-mkdir -p $progHome
+ensure_dir_exists $progHome
 fi
 
 if [ ! -d $WINEPREFIX ]; then
